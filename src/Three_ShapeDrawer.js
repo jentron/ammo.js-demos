@@ -1,7 +1,6 @@
 function Three_ShapeDrawer(options){
   // Extend the class
   ShapeDrawer.apply(this,arguments);
-
   var th = this;
 
   // Extend settings
@@ -40,7 +39,14 @@ function Three_ShapeDrawer(options){
   this.meshes = []; // Meshes for simple shapes
   this.models = []; // External models
   this.wheelMeshes = []; // Wheelmeshes, array of arrays (one array for each vehicle)
-
+// Controls
+   this.datControl = new function(){
+        this.lampX = -10;
+        this.lampY =  10;
+        this.lampZ = -10;
+    }
+    this.datGui = null;
+ 
   init();
   animate();
 
@@ -49,6 +55,11 @@ function Three_ShapeDrawer(options){
     document.body.appendChild( container );
     th.canvas = container;
 
+    datGui = new dat.GUI();
+    datGui.add(th.datControl, 'lampX', -50, 50); 
+    datGui.add(th.datControl, 'lampY', 0, 50); 
+    datGui.add(th.datControl, 'lampZ', -50, 50); 
+
     // SCENE CAMERA
     th.camera = new THREE.PerspectiveCamera( 25, SCREEN_WIDTH / SCREEN_HEIGHT, NEAR, FAR );
     var camera = th.camera;
@@ -56,20 +67,22 @@ function Three_ShapeDrawer(options){
     // SCENE
     th.scene = new THREE.Scene();
     th.scene.fog = new THREE.Fog( 0x000000, 10, 100 );
-    //THREE.ColorUtils.adjustHSV( th.scene.fog.color, 0.02, -0.15, -0.15 );
+    th.scene.fog.color.offsetHSL( 0.02, -0.15, -0.15 );
 
     // LIGHTS
     var ambient = new THREE.AmbientLight( 0x444444 );
     th.scene.add( ambient );
 
     th.light = new THREE.SpotLight( 0xffffff );
-    th.light.position.set( -100, 100, 100 );
+    th.light.position.set( th.datControl.lampX, th.datControl.lampY, th.datControl.lampZ );
     th.light.target.position.set(1, 0, 15 );
     th.light.castShadow = true;
+//    th.light.shadowCameraVisible = true; 
     th.scene.add( th.light );
 
     // RENDERER
-    renderer = new THREE.WebGLRenderer( { clearColor: 0x000000, clearAlpha: 1, antialias: false } );
+//    renderer = new THREE.WebGLRenderer( { clearColor: 0x000000, clearAlpha: 1, antialias: false} );
+    renderer = new THREE.WebGLRenderer( { clearAlpha: 1, antialias: false, alpha: true} );
     renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
     renderer.domElement.style.position = "relative";
     renderer.domElement.style.top = MARGIN + 'px';
@@ -78,16 +91,17 @@ function Three_ShapeDrawer(options){
     //document.addEventListener('mousemove',onDocumentMouseMove);
 
     renderer.setClearColor( th.scene.fog.color, 1 );
-    renderer.autoClear = false;
+//    renderer.autoClear = false;
 
-    renderer.shadowCameraNear = 1;
-    renderer.shadowCameraFar = 200;
-    renderer.shadowCameraFov = 15;
+    th.light.shadowCameraNear = 1;
+    th.light.shadowCameraFar = 200;
+//    renderer.shadowCameraFov = 15;
 
-    renderer.shadowMapBias = 0.0039;
-    renderer.shadowMapDarkness = 0.5;
-    renderer.shadowMapWidth = SHADOW_MAP_WIDTH;
-    renderer.shadowMapHeight = SHADOW_MAP_HEIGHT;
+//    renderer.shadowMapBias = 0.0039;
+    th.light.shadowMapDarkness = 0.05;
+
+    th.light.shadowMapWidth = SHADOW_MAP_WIDTH;
+    th.light.shadowMapHeight = SHADOW_MAP_HEIGHT;
 
     renderer.shadowMapEnabled = true;
     renderer.shadowMapSoft = true;
@@ -141,7 +155,7 @@ Three_ShapeDrawer.prototype.createShape = function(shape,transform){
   case DemoApplication.prototype.BOX_SHAPE_PROXYTYPE:
     var h = shape.getHalfExtentsWithMargin();
     // Add THREE box
-    var cube = new THREE.Mesh(new THREE.CubeGeometry( h.x()*2, h.y()*2, h.z()*2 ),
+    var cube = new THREE.Mesh(new THREE.BoxGeometry( h.x()*2, h.y()*2, h.z()*2 ),
 			  new THREE.MeshLambertMaterial( { color: 0xaaaaaa }));
     if(transform!=undefined){
       var quat = new Ammo.btQuaternion();
@@ -152,7 +166,7 @@ Three_ShapeDrawer.prototype.createShape = function(shape,transform){
       cube.position.set(origin.x(),
 			origin.y(),
 			origin.z());
-      cube.useQuaternion = true;
+//      cube.useQuaternion = true;
       cube.quaternion.set(quat.x(),quat.y(),quat.z(),quat.w());
     }
     cube.castShadow = true;
@@ -184,7 +198,7 @@ Three_ShapeDrawer.prototype.createShape = function(shape,transform){
       cyl.position.set(origin.x(),
 		       origin.y(),
 		       origin.z());
-      cyl.useQuaternion = true;
+//      cyl.useQuaternion = true;
       var a = quat.getAxis();
       cyl.quaternion.setFromAxisAngle(new THREE.Vector3(a.x(),
 							a.y(),
@@ -227,7 +241,7 @@ Three_ShapeDrawer.prototype.createShape = function(shape,transform){
       mesh.add(options.threemeshes[i]);
     } else
       mesh = this.createShape(wheelshape,t);
-    mesh.useQuaternion = true;
+//    mesh.useQuaternion = true;
     wheels.push(mesh);
     this.scene.add(mesh);
     /*this.scene.findNode("rot"+"vehicle"+this.vehicles.length+"_wheel_"+i)
@@ -260,7 +274,7 @@ Three_ShapeDrawer.prototype.add = function(body,shape,options){
       this.drawbody.push(true); // Draw this body
       var h = shape.getHalfExtentsWithMargin();
       // Add THREE box
-      mesh = new THREE.Mesh (new THREE.CubeGeometry( h.x()*2, h.y()*2, h.z()*2 ),
+      mesh = new THREE.Mesh (new THREE.BoxGeometry( h.x()*2, h.y()*2, h.z()*2 ),
 			     new THREE.MeshLambertMaterial( { color: 0xaaaaaa }));
       //cube.position.set();
       mesh.castShadow = true;
@@ -311,7 +325,8 @@ Three_ShapeDrawer.prototype.add = function(body,shape,options){
       this.drawbody.push(true);
       var geometry = new THREE.PlaneGeometry( 100, 100 );
       var planeMaterial = new THREE.MeshLambertMaterial( { color: 0xffffff } );
-      THREE.ColorUtils.adjustHSV( planeMaterial.color, 0, 0, 0.9 );
+//      THREE.ColorUtils.adjustHSV( planeMaterial.color, 0, 0, 0.9 );
+      planeMaterial.color.offsetHSL( 0, 0, 0.9 );
       mesh = new THREE.Object3D();
       ground = new THREE.Mesh( geometry, planeMaterial );
       ground.scale.set( 100, 100, 100 );
@@ -320,7 +335,7 @@ Three_ShapeDrawer.prototype.add = function(body,shape,options){
       ground.receiveShadow = true;
 
       var submesh = new THREE.Object3D();  
-      submesh.useQuaternion = true;
+//      submesh.useQuaternion = true;
       submesh.add(ground);
 
       var t = new Ammo.btTransform();
@@ -346,7 +361,7 @@ Three_ShapeDrawer.prototype.add = function(body,shape,options){
       //var he = shape.getHalfExtentsWithoutMargin();
       var height = shape.getHalfHeight()*2;
       // Add THREE cylinder
-      mesh = new THREE.Mesh (new THREE.CylinderGeometry( radius, radius, height, this.geoslices, this.geoslices, false ),
+/*      mesh = new THREE.Mesh (new THREE.CylinderGeometry( radius, radius, height, this.geoslices, this.geoslices, false ),
 			     this.material);
 
       var sphere1 = new THREE.Mesh(new THREE.SphereGeometry( radius, this.geoslices, this.geoslices), new THREE.MeshLambertMaterial( { color: 0xaaaaaa }));
@@ -356,9 +371,21 @@ Three_ShapeDrawer.prototype.add = function(body,shape,options){
 
       mesh.add(sphere1,this.material);
       mesh.add(sphere2,this.material);
-
+*/
+      var capsule = new THREE.SphereGeometry( radius, this.geoslices, this.geoslices);
+      var capsuleMaterial= new THREE.MeshLambertMaterial( { color: 0xcaa88a });
+      mesh = new THREE.Mesh(capsule, capsuleMaterial);
+      var axis =['x','y','z'];
+      for(var i =0; i<capsule.vertices.length; i++){
+            if(capsule.vertices[i][axis[up]] < 0.01){
+                  capsule.vertices[i][axis[up]]-=shape.getHalfHeight();
+            } else {
+                  capsule.vertices[i][axis[up]]+=shape.getHalfHeight();
+            }
+      }
+      capsule.verticesNeedUpdate = true;
+      mesh.receiveShadow = true;
       mesh.castShadow = true;
-      mesh.receiveShadow = false;
       break;
 
     case DemoApplication.prototype.COMPOUND_SHAPE_PROXYTYPE:
@@ -377,10 +404,10 @@ Three_ShapeDrawer.prototype.add = function(body,shape,options){
 	case DemoApplication.prototype.BOX_SHAPE_PROXYTYPE:
 	  var castShape = Ammo.castObject(childShape,Ammo.btBoxShape);
 	  var h = castShape.getHalfExtentsWithMargin();
-	  var cube = new THREE.Mesh (new THREE.CubeGeometry( h.x()*2, h.y()*2, h.z()*2 ),
+	  var cube = new THREE.Mesh (new THREE.BoxGeometry( h.x()*2, h.y()*2, h.z()*2 ),
 				     new THREE.MeshLambertMaterial( { color: 0xaaaaaa }));
 	  cube.position.set(origin.x(),origin.y(),origin.z());
-	  cube.useQuaternion = true;
+//	  cube.useQuaternion = true;
 	  cube.quaternion.set(quat.x(),quat.y(),quat.z(),quat.w());
 	  cube.castShadow=true;
 	  cube.receiveShadow=true;
@@ -405,6 +432,8 @@ Three_ShapeDrawer.prototype.add = function(body,shape,options){
 Three_ShapeDrawer.prototype.update = function(){
   var transform = this.tempTransform;
   var quat = this.tempQuaternion;
+
+  this.light.position.set( this.datControl.lampX, this.datControl.lampY, this.datControl.lampZ );
   for(var i=0; i<this.bodies.length; i++){
     if(this.drawbody[i]){
       // Get position and rotation
@@ -426,7 +455,7 @@ Three_ShapeDrawer.prototype.update = function(){
 	var r = transform.getRotation();
 	quat.setValue(r.x(),r.y(),r.z(),r.w());
 	var a = quat.getAxis();
-	this.meshes[i].useQuaternion = true;
+//	this.meshes[i].useQuaternion = true;
 	this.meshes[i].quaternion.setFromAxisAngle(new THREE.Vector3(a.x(),
 								     a.y(),
 								     a.z()),
@@ -511,5 +540,5 @@ Three_ShapeDrawer.prototype.enableShadows = function(enable){
   this.light.castShadow = enable;
   this.renderer.shadowMapEnabled = enable;
   this.renderer.shadowMapSoft = enable;
-  this.renderer.shadowMapDarkness = enable ? 0.5 : 0.0;
+//  this.renderer.shadowMapDarkness = enable ? 0.5 : 0.0;
 };
