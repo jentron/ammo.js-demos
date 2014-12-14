@@ -1381,10 +1381,10 @@ DemoApplication.prototype.setIdle = function(idle){
  */
 DemoApplication.prototype.keyboardCallbacksInternal = {
   q:function(e,da){ },
-  l:function(e,da){ da.stepLeft(); },
-  r:function(e,da){ da.stepRight(); },
-  f:function(e,da){ da.stepFront(); },
-  b:function(e,da){ da.stepBack(); },
+  a:function(e,da){ da.stepLeft(); },
+  d:function(e,da){ da.stepRight(); },
+  w:function(e,da){ da.stepFront(); },
+  s:function(e,da){ da.stepBack(); },
   z:function(e,da){ da.zoomIn(); },
   x:function(e,da){ da.zoomOut(); },
   i:function(e,da){ da.toggleIdle(); },
