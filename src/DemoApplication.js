@@ -650,7 +650,7 @@ DemoApplication.prototype.clientResetScene = function(){
 DemoApplication.prototype.setShootBoxShape = function(shapeType){
   switch(shapeType){
   case 'box':      this.m_shootBoxShape = new Ammo.btBoxShape(this.tVec(.5,.5,.5)); break;
-  case 'sphere':   this.m_shootBoxShape = new Ammo.btSphereShape(.5); break;
+  case 'sphere':   this.m_shootBoxShape = new Ammo.btSphereShape(.25); break;
   case 'cylinder': this.m_shootBoxShape = new Ammo.btCylinderShape(this.tVec(.5,.5,.5)); break;
   case 'cone':     this.m_shootBoxShape = new Ammo.btConeShape(.5,1); break;
   default: this.setShootBoxShape('sphere'); break;
@@ -690,7 +690,7 @@ DemoApplication.prototype.tQuat = function(x,y,z,w){
  */
 DemoApplication.prototype.shootBox = function(destination){
   if(this.m_dynamicsWorld){
-    var mass = 1.0;
+    var mass = 2.0;
     var startTransform = this.tempTransform;
     startTransform.setIdentity();
     var camPos = this.getCameraPosition();
