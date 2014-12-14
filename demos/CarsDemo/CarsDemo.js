@@ -49,18 +49,18 @@ MyDemoApplication.prototype.initPhysics = function(){
       var bb = textGeo.boundingBox;
       var textmesh = new THREE.Mesh(textGeo,
 				    new THREE.MeshPhongMaterial({ color: colors[k], specular: 0xffffff, ambient: 0x555555 }));
-      textmesh.position.set(-0.5*(bb.x[1]+bb.x[0]),
-			    -0.5*(bb.y[1]+bb.y[0]),
-			    -0.5*(bb.z[1]+bb.z[0]));
+      textmesh.position.set(-0.5*(bb.max.x+bb.min.x),
+			    -0.5*(bb.max.y+bb.min.y),
+			    -0.5*(bb.max.z+bb.min.z));
       var o = new THREE.Object3D();
       boxTransform.setIdentity();
       boxTransform.setOrigin(this.tVec(textx[k],
-				       (strings[k].length -(i+0.5))*(bb.y[1]-bb.y[0]),
+				       (strings[k].length -(i+0.5))*(bb.max.y-bb.min.y),
 				       textz[k]));
       boxTransform.setRotation(new btQuaternion(this.tVec(0,1,0),-Math.PI/2));
-      var boxShape = new Ammo.btBoxShape(this.tVec(0.5*(bb.x[1]-bb.x[0]),
-						   0.5*(bb.y[1]-bb.y[0]),
-						   0.5*(bb.z[1]-bb.z[0])));
+      var boxShape = new Ammo.btBoxShape(this.tVec(0.5*(bb.max.x-bb.min.x),
+						   0.5*(bb.max.y-bb.min.y),
+						   0.5*(bb.max.z-bb.min.z)));
       textmesh.castShadow = true;
       textmesh.receiveShadow = true;
       o.add(textmesh);
@@ -76,13 +76,13 @@ MyDemoApplication.prototype.initPhysics = function(){
 
   // Vehicle
   var wheelLoader = new THREE.BinaryLoader(true);
-  wheelLoader.load({
-      model: "../../other/three/obj/veyron/parts/veyron_wheel_bin.js",
-      callback: function(wheelGeometry){
+  wheelLoader.load(
+      "../../other/three/obj/veyron/parts/veyron_wheel_bin.js",
+      function(wheelGeometry, wheelMaterial){
 	var bodyLoader = new THREE.BinaryLoader(true);
-	bodyLoader.load({
-	    model: "../../other/three/obj/veyron/parts/veyron_body_bin.js",
-	      callback: function(bodyGeometry){
+	bodyLoader.load(
+	    "../../other/three/obj/veyron/parts/veyron_body_bin.js",
+	    function(bodyGeometry, bodyMaterial){
 	      var r = "../../other/three/textures/cube/Bridge2/";
 	      var urls = [ r + "posx.jpg", r + "negx.jpg",
 			   r + "posy.jpg", r + "negy.jpg",
@@ -108,8 +108,8 @@ MyDemoApplication.prototype.initPhysics = function(){
 			   new THREE.Object3D(),
 			   new THREE.Object3D(),
 			   new THREE.Object3D()];
-	      wheelGeometry.materials[ 0 ][ 0 ] = new THREE.MeshLambertMaterial({color: 0xffffff, reflectivity:0.75});
-	      wheelGeometry.materials[ 1 ][ 0 ] = new THREE.MeshLambertMaterial({color: 0x333333});
+	      wheelMaterial[ 0 ][ 0 ] = new THREE.MeshLambertMaterial({color: 0xffffff, reflectivity:0.75});
+	      wheelMaterial[ 1 ][ 0 ] = new THREE.MeshLambertMaterial({color: 0x333333});
 
 	      for(var i=0; i<wmesh.length; i++){
 	
@@ -117,13 +117,13 @@ MyDemoApplication.prototype.initPhysics = function(){
 		wheelmesh.scale.set(s,s,s);
 		wheelGeometry.computeBoundingBox();
 		var bb = wheelGeometry.boundingBox;
-		wheelmesh.position.set(-s*(bb.x[1]+bb.x[0])*0.5,
-				       -s*(bb.y[1]+bb.y[0])*0.5,
-				       -s*(bb.z[1]+bb.z[0])*0.5);
+		wheelmesh.position.set(-s*(bb.max.x+bb.min.x)*0.5,
+				       -s*(bb.max.y+bb.min.y)*0.5,
+				       -s*(bb.max.z+bb.min.z)*0.5);
 		wheelmesh.castShadow = true;
 		wheelmesh.receiveShadow = true;
 		wmesh[i].add(wheelmesh);
-		wmesh[i].position.set((bodybb.x[1]+bodybb.x[0])*0.5*s,
+		wmesh[i].position.set((bodybb.max.x+bodybb.min.x)*0.5*s,
 				      0,
 				      0);
 		wmesh[i].useQuaternion=true;
@@ -134,9 +134,9 @@ MyDemoApplication.prototype.initPhysics = function(){
 	      
 	      spawnVehicle(o,wmesh);
 	    }
-	  });
+	  );
       }
-    });
+    );
   
   // Example of setting a callback - overrides old callbacks
   this.keyboardCallback({
