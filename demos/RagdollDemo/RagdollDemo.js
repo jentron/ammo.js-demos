@@ -26,13 +26,14 @@ MyDemoApplication.prototype.initPhysics = function(){
   var groundShape = new Ammo.btBoxShape(this.tVec(6, 0.5, 6));
   var groundTransform = new Ammo.btTransform();
   groundTransform.setIdentity();
-  groundTransform.setOrigin(this.tVec(0, -1.0, 0));
+  groundTransform.setOrigin(this.tVec(0, -.5, 0));
   var ground = this.localCreateRigidBody(0, groundTransform, groundShape);
 
   // Create infinite ground plane
-  var aabbShape = new Ammo.btStaticPlaneShape(this.tVec(0, 1, 0), 0);
+  var aabbShape = new Ammo.btStaticPlaneShape(this.tVec(0, 0, 0), 0);
   var aabbTransform = new Ammo.btTransform();
   aabbTransform.setIdentity();
+  groundTransform.setOrigin(this.tVec(0, -1.0, 0));
   this.localCreateRigidBody(0, aabbTransform, aabbShape);
 
   // Set keyboard actions
