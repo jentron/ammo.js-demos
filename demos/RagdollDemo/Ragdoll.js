@@ -188,9 +188,10 @@ function RagDoll(da,positionOffset){
 				       m_bodies.LEFT_LOWER_LEG,
 				       new Ammo.btVector3(0,-0.225,0),
 				       new Ammo.btVector3(0,0.185,0),
-				       new Ammo.btVector3(0,0,0.225),
-				       new Ammo.btVector3(0,0,0.185));
+				       new Ammo.btVector3(1,0,0),
+				       new Ammo.btVector3(1,0,0));
 
+  hingeC.setLimit((-0.1), (Math.PI*0.9));
   m_joints.JOINT_LEFT_KNEE = hingeC;
   hingeC.setDbgDrawSize(CONSTRAINT_DEBUG_SIZE);
 
@@ -200,10 +201,10 @@ function RagDoll(da,positionOffset){
 				       m_bodies.LEFT_FOOT,
 				       new Ammo.btVector3(0,-0.225,0),
 				       new Ammo.btVector3(0,0.015,0.1),
-				       new Ammo.btVector3(0,0,0.225),
-				       new Ammo.btVector3(0,0,0.015));
+				       new Ammo.btVector3(1,0,0),
+				       new Ammo.btVector3(1,0,0));
 
-  hingeC.setLimit((-1.57), (Math.PI/2));
+  hingeC.setLimit((-1), (1));
   m_joints.JOINT_LEFT_ANKLE = hingeC;
   hingeC.setDbgDrawSize(CONSTRAINT_DEBUG_SIZE);
 
@@ -230,9 +231,10 @@ function RagDoll(da,positionOffset){
 				       m_bodies.RIGHT_LOWER_LEG,
 				       new Ammo.btVector3(0,-0.225,0),
 				       new Ammo.btVector3(0,0.185,0),
-				       new Ammo.btVector3(0,0,0.225),
-				       new Ammo.btVector3(0,0,0.185));
+				       new Ammo.btVector3(1,0,0),
+				       new Ammo.btVector3(1,0,0));
 
+  hingeC.setLimit((-0.1), (Math.PI*0.9));
   m_joints.JOINT_RIGHT_KNEE = hingeC;
   hingeC.setDbgDrawSize(CONSTRAINT_DEBUG_SIZE);
 
@@ -242,10 +244,10 @@ function RagDoll(da,positionOffset){
 				       m_bodies.RIGHT_FOOT,
 				       new Ammo.btVector3(0,-0.225,0),
 				       new Ammo.btVector3(0,0.015,0.1),
-				       new Ammo.btVector3(0,0,0.225),
-				       new Ammo.btVector3(0,0,0.015));
+				       new Ammo.btVector3(1,0,0),
+				       new Ammo.btVector3(1,0,0));
 
-  hingeC.setLimit((-1.57), (Math.PI/2));
+  hingeC.setLimit((-1), (1));
   m_joints.JOINT_RIGHT_ANKLE = hingeC;
   hingeC.setDbgDrawSize(CONSTRAINT_DEBUG_SIZE);
 
