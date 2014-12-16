@@ -53,7 +53,8 @@ function RagDoll(da,positionOffset){
   m_shapes.RIGHT_LOWER_ARM = new Ammo.btCapsuleShape((0.04), (0.25));
 
   // Setup all the rigid bodies
-  var offset = new Ammo.btTransform(); offset.setIdentity();
+  var offset = new Ammo.btTransform();
+  offset.setIdentity();
   offset.setOrigin(positionOffset);
 
   var transform = new Ammo.btTransform();
@@ -66,38 +67,39 @@ function RagDoll(da,positionOffset){
   transform.setOrigin(new Ammo.btVector3((0.), (1.2), (0.)));
   transform.op_mul(offset)
   m_bodies.SPINE = da.localCreateRigidBody((1.), transform, m_shapes.SPINE);
+
   transform.setIdentity();
   transform.setOrigin(new Ammo.btVector3((0.), (1.6), (0.)));
   transform.op_mul(offset);
   m_bodies.HEAD = da.localCreateRigidBody((1.), transform, m_shapes.HEAD);
 
   transform.setIdentity();
-  transform.setOrigin(new Ammo.btVector3((-0.18), (0.65), (0.)));
+  transform.setOrigin(new Ammo.btVector3((-0.14), (0.65), (0.)));
   transform.op_mul(offset);
   m_bodies.LEFT_UPPER_LEG = da.localCreateRigidBody((1.), transform, m_shapes.LEFT_UPPER_LEG);
 
   transform.setIdentity();
-  transform.setOrigin(new Ammo.btVector3((-0.18), (0.2), (0.)));
+  transform.setOrigin(new Ammo.btVector3((-0.14), (0.2), (0.)));
   transform.op_mul(offset);
   m_bodies.LEFT_LOWER_LEG = da.localCreateRigidBody((1.), transform, m_shapes.LEFT_LOWER_LEG);
 
   transform.setIdentity();
-  transform.setOrigin(new Ammo.btVector3((-0.18), (0.0), (-0.1)));
+  transform.setOrigin(new Ammo.btVector3((-0.14), (0.0), (-0.1)));
   transform.op_mul(offset);
   m_bodies.LEFT_FOOT = da.localCreateRigidBody((1.), transform, m_shapes.LEFT_FOOT);
 
   transform.setIdentity();
-  transform.setOrigin(new Ammo.btVector3((0.18), (0.65), (0.)));
+  transform.setOrigin(new Ammo.btVector3((0.14), (0.65), (0.)));
   transform.op_mul(offset);
   m_bodies.RIGHT_UPPER_LEG = da.localCreateRigidBody((1.), transform, m_shapes.RIGHT_UPPER_LEG);
 
   transform.setIdentity();
-  transform.setOrigin(new Ammo.btVector3((0.18), (0.2), (0.)));
+  transform.setOrigin(new Ammo.btVector3((0.14), (0.2), (0.)));
   transform.op_mul(offset);
   m_bodies.RIGHT_LOWER_LEG = da.localCreateRigidBody((1.), transform, m_shapes.RIGHT_LOWER_LEG);
 
   transform.setIdentity();
-  transform.setOrigin(new Ammo.btVector3((0.18), (0.0), (-0.1)));
+  transform.setOrigin(new Ammo.btVector3((0.14), (0.0), (-0.1)));
   transform.op_mul(offset);
   m_bodies.RIGHT_FOOT = da.localCreateRigidBody((1.), transform, m_shapes.RIGHT_FOOT);
 
@@ -133,8 +135,8 @@ function RagDoll(da,positionOffset){
   }
 
   // Now setup the constraints
-  //var hingeC = new Ammo.btHingeConstraint();
-  //var coneC = new Ammo.btConeTwistConstraint();
+  var hingeC = null;
+  var coneC = null;
 
   var localA = new Ammo.btTransform();
   var localB = new Ammo.btTransform();
@@ -145,22 +147,35 @@ function RagDoll(da,positionOffset){
   var hingeC = new Ammo.btHingeConstraint(m_bodies.PELVIS, m_bodies.SPINE, localA, localB);
   hingeC.setLimit((-Math.PI/4), (Math.PI/2));
   */
-
+/*
   var hingeC = new Ammo.btHingeConstraint(m_bodies.PELVIS,
 					   m_bodies.SPINE,
-					   new Ammo.btVector3(0,0.15,-0.05),
-					   new Ammo.btVector3(0,-0.15,0),
-					   new Ammo.btVector3(0,0,0.15),
-					   new Ammo.btVector3(0,0,0.15));
+					   new Ammo.btVector3(0,0.11,-0.11),
+					   new Ammo.btVector3(0,-0.20,-0.08),
+					   new Ammo.btVector3(0,0,1),
+					   new Ammo.btVector3(0,0,1));
   m_joints.JOINT_PELVIS_SPINE = hingeC;
   hingeC.setDbgDrawSize(CONSTRAINT_DEBUG_SIZE);
 
   m_ownerWorld.addConstraint(m_joints.JOINT_PELVIS_SPINE, true);
+*/
+  
+  localA.setIdentity(); localB.setIdentity();
+  localA.getBasis().setEulerZYX(0,0,Math.PI/4); localA.setOrigin(new Ammo.btVector3((0), (0.11), (-0.11)));
+  localB.getBasis().setEulerZYX(0,0,Math.PI/4); localB.setOrigin(new Ammo.btVector3((0.), (-0.20), (-0.08)));
+  coneC = new Ammo.btConeTwistConstraint(m_bodies.PELVIS, m_bodies.SPINE, localA, localB);
+  coneC.setLimit(Math.PI/4, Math.PI/4, 0);
+  m_joints.JOINT_PELVIS_SPINE = coneC;
+  coneC.setDbgDrawSize(CONSTRAINT_DEBUG_SIZE);
 
+  m_ownerWorld.addConstraint(m_joints.JOINT_PELVIS_SPINE, true);
+
+  
+  
   localA.setIdentity(); localB.setIdentity();
   localA.getBasis().setEulerZYX(0,0,Math.PI/2); localA.setOrigin(new Ammo.btVector3((0.), (0.30), (0.)));
   localB.getBasis().setEulerZYX(0,0,Math.PI/2); localB.setOrigin(new Ammo.btVector3((0.), (-0.14), (0.)));
-  var coneC = new Ammo.btConeTwistConstraint(m_bodies.SPINE, m_bodies.HEAD, localA, localB);
+  coneC = new Ammo.btConeTwistConstraint(m_bodies.SPINE, m_bodies.HEAD, localA, localB);
   coneC.setLimit(Math.PI/4, Math.PI/4, Math.PI/2);
   m_joints.JOINT_SPINE_HEAD = coneC;
   coneC.setDbgDrawSize(CONSTRAINT_DEBUG_SIZE);
@@ -169,7 +184,7 @@ function RagDoll(da,positionOffset){
 
 
   localA.setIdentity(); localB.setIdentity();
-  localA.getBasis().setEulerZYX(0,0,-Math.PI/4*5); localA.setOrigin(new Ammo.btVector3((-0.18), (-0.10), (-0.03)));
+  localA.getBasis().setEulerZYX(0,0,-Math.PI/4*5); localA.setOrigin(new Ammo.btVector3((-0.14), (-0.10), (-0.03)));
   localB.getBasis().setEulerZYX(0,0,-Math.PI/4*5); localB.setOrigin(new Ammo.btVector3((0.), (0.225), (0.)));
   coneC = new Ammo.btConeTwistConstraint(m_bodies.PELVIS, m_bodies.LEFT_UPPER_LEG, localA, localB);
   coneC.setLimit(Math.PI/4, Math.PI/4, 0);
@@ -211,7 +226,7 @@ function RagDoll(da,positionOffset){
   m_ownerWorld.addConstraint(m_joints.JOINT_LEFT_ANKLE, true);
 
   localA.setIdentity(); localB.setIdentity();
-  localA.getBasis().setEulerZYX(0,0,Math.PI/4); localA.setOrigin(new Ammo.btVector3((0.18), (-0.10), (-0.03)));
+  localA.getBasis().setEulerZYX(0,0,Math.PI/4); localA.setOrigin(new Ammo.btVector3((0.14), (-0.10), (-0.03)));
   localB.getBasis().setEulerZYX(0,0,Math.PI/4); localB.setOrigin(new Ammo.btVector3((0.), (0.225), (0.)));
   coneC = new Ammo.btConeTwistConstraint(m_bodies.PELVIS, m_bodies.RIGHT_UPPER_LEG, localA, localB);
   coneC.setLimit(Math.PI/4, Math.PI/4, 0);
