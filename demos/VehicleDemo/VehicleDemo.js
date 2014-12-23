@@ -248,23 +248,35 @@ MyDemoApplication.prototype.initPhysics = function(){
   }
 
   this.addVehicle(m_vehicle,m_wheelShape);
-  
+ 
+  function cancelDefaultAction(e) {
+    var evt = e ? e:window.event;
+    if (evt.preventDefault) evt.preventDefault();
+    evt.returnValue = false;
+    return false;
+  }
+
+ 
   // Example of setting a callback - overrides old callbacks
   this.keyboardCallback({
       left:function(event,demoapplication){
 	gVehicleSteering = 0.2;
+        cancelDefaultAction(event);
       },
       right:function(event,demoapplication){
 	gVehicleSteering = -0.2;
+        cancelDefaultAction(event);
       },
       up:function(event,demoapplication){
 	gEngineForce = maxEngineForce;
 	gBreakingForce = 0.0;
+        cancelDefaultAction(event);
       },
       down:function(event,demoapplication){
 	gEngineForce = -maxEngineForce;
 	//gBreakingForce = maxBreakingForce; 
 	//gEngineForce = 0.0;
+        cancelDefaultAction(event);
       }
     });
 
